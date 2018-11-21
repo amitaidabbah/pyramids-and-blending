@@ -108,5 +108,10 @@ if __name__ == '__main__':
     # expand(reduce(a, filter), filter)
     image = read_image("rose.jpg", 1)
     lap, filter = build_laplacian_pyramid(image, 15, 3)
+    for i in range(len(lap)):
+        plt.imshow(lap[i],cmap='gray')
+        plt.show(
+        )
     coef = [1 for i in range(len(lap))]
-    imdisplay(laplacian_to_image(lap, filter, coef), 1)
+    print(coef)
+    imdisplay(laplacian_to_image(lap,filter,coef),1)
