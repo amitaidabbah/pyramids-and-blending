@@ -101,6 +101,7 @@ def laplacian_to_image(lpyr, filter_vec, coeff):
         coeff = coeff[:-1]
     return lpyr[0]
 
+def render_pyramid(pyr, levels):
 
 if __name__ == '__main__':
     a = np.arange(0, 256, 1).reshape((16, 16))
