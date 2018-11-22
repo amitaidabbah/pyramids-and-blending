@@ -1,8 +1,10 @@
+import imageio
 import numpy as np
 from imageio import imread
 from scipy.ndimage.filters import convolve1d
 from skimage.color import rgb2grey
 import matplotlib.pyplot as plt
+import scipy.misc
 
 BASE_FILTER = np.array([1, 1])
 RGB = 2
@@ -73,13 +75,11 @@ def build_gaussian_pyramid(im, max_levels, filter_size):
     gaussian_pyramid.append(im)
     filter = build_filter(filter_size)
     for i in range(max_levels):
+        x, y = im.shape
+        if x < 16 or y < 16:
+            break
         im = reduce(im, filter)
         gaussian_pyramid.append(im)
-        x, y = im.shape
-        if x * y < 64:
-            break
-        else:
-            continue
     return gaussian_pyramid, filter.reshape((1, filter_size))
 
 
@@ -101,18 +101,46 @@ def laplacian_to_image(lpyr, filter_vec, coeff):
         coeff = coeff[:-1]
     return lpyr[0]
 
+
 def render_pyramid(pyr, levels):
+    width = sum([pyr[i].shape[1] for i in range(levels)])
+    new_image = np.zeros((pyr[0].shape[0], width))
+    old_y = 0
+    for i in range(levels):
+        new_image[0:pyr[i].shape[0], old_y:old_y + pyr[i].shape[1]] = np.interp(pyr[i],
+                                                                                (np.min(pyr[i]), np.max(pyr[i])),
+                                                                                (0, 1))
+        old_y += pyr[i].shape[1]
+    return new_image
+
+
+def display_pyramid(pyr, levels):
+    plt.imshow(render_pyramid(pyr, levels), cmap="grey")
+    plt.show()
+
+
+def pyramid_blending(im1, im2, mask, max_levels, filter_size_im, filter_size_mask):
+    lap1, filter1 = build_laplacian_pyramid(im1, max_levels, filter_size_im)
+    lap2, filter2 = build_laplacian_pyramid(im2, max_levels, filter_size_im)
+    gaus, gaus_filter = build_gaussian_pyramid(mask.astype(np.float64), max_levels, filter_size_mask)
+    lap_out = []
+    for i in range(len(lap1)):
+        lap_out.append(gaus[i] * lap1[i] + (1 - gaus[i]) * lap2[i])
+    coef = [1 for i in range(len(lap_out))]
+    return laplacian_to_image(lap_out, filter1, coef)
+
 
 if __name__ == '__main__':
-    a = np.arange(0, 256, 1).reshape((16, 16))
-    # filter = build_filter(3)
-    # expand(reduce(a, filter), filter)
-    image = read_image("rose.jpg", 1)
-    lap, filter = build_laplacian_pyramid(image, 15, 3)
-    for i in range(len(lap)):
-        plt.imshow(lap[i],cmap='gray')
-        plt.show(
-        )
-    coef = [1 for i in range(len(lap))]
-    print(coef)
-    imdisplay(laplacian_to_image(lap,filter,coef),1)
+    apple = read_image("apple.jpg", 1)
+    pear = read_image("pear.jpg", 1)
+    plt.imshow(apple, cmap="gray")
+    plt.show()
+    plt.imshow(pear, cmap="gray")
+    plt.show()
+    mask = np.zeros_like(pear)
+    mask[:, 150:] = 1
+    print(mask)
+    print(apple.shape, pear.shape, mask.shape)
+    res = pyramid_blending(apple, pear, mask, 10, 3, 3)
+    plt.imshow(res, cmap="gray")
+    plt.show()
