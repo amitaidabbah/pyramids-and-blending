@@ -21,7 +21,6 @@ def read_image(filename, representation):
     """
     if representation == GRAYSCALE:
         image = imread(filename)
-        print(image.shape)
         if image.ndim == 3:
             return rgb2grey(image)
         return image / 255
@@ -183,6 +182,7 @@ def pyramid_blending(im1, im2, mask, max_levels, filter_size_im, filter_size_mas
     gaus, gaus_filter = build_gaussian_pyramid(mask.astype(np.float64), max_levels, filter_size_mask)
     lap_out = []
     for i in range(len(lap1)):
+        print(len(lap1))
         lap_out.append(gaus[i] * lap1[i] + (1 - gaus[i]) * lap2[i])
     coef = [1 for i in range(len(lap_out))]
     return laplacian_to_image(lap_out, filter1, coef)
@@ -203,22 +203,20 @@ def pyramid_blend_RGB(im1, im2, mask, max_levels, filter_size_im, filter_size_ma
     res_G = pyramid_blending(im1[:, :, 1], im2[:, :, 1], mask, max_levels, filter_size_im, filter_size_mask)
     res_B = pyramid_blending(im1[:, :, 2], im2[:, :, 2], mask, max_levels, filter_size_im, filter_size_mask)
     res = np.stack((res_R, res_G, res_B), axis=-1)
-    plt.imshow(res)
-    plt.show()
+    return res
 
 
 if __name__ == '__main__':
-    apple = read_image("apple.jpg", 2)
-    pear = read_image("pear.jpg", 2)
-    # plt.imshow(apple, cmap="gray")
+    model = read_image("model.jpg", 2)
+    dolphin = read_image("dolphins.jpg", 2)
+    mask = read_image("dolphinsmask.jpg", 1)
+    # plt.imshow(mask, cmap="gray")
     # plt.show()
+    # print(mask.shape, mask.min())
     # plt.imshow(pear, cmap="gray")
     # plt.show()
-    mask = np.zeros_like(pear[:, :, 0])
-    mask[:, 150:] = 1
-    pyramid_blend_RGB(apple, pear, mask, 10, 3, 3)
-    # print(mask)
-    # print(apple.shape, pear.shape, mask.shape)
-    # res = pyramid_blending(apple, pear, mask, 10, 3, 3)
-    # plt.imshow(res, cmap="gray")
-    # plt.show()
+    res = pyramid_blend_RGB(model, dolphin, mask, 10, 3, 3)
+    print(res.shape)
+    plt.imshow(res)
+    plt.show()
+    scipy.misc.imsave("res.jpg", res, )
