@@ -258,7 +258,3 @@ def blending_example2():
     combine_plot(model, dolphin, mask, np.clip(res, 0, 1))
     return model, dolphin, mask.astype(np.bool), res
 
-
-if __name__ == '__main__':
-    blending_example1()
-    # blending_example2()
