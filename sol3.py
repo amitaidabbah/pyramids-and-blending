@@ -161,7 +161,7 @@ def display_pyramid(pyr, levels):
     :param levels: num of levels to display
     :return:
     """
-    plt.imshow(render_pyramid(pyr, levels), cmap="grey")
+    plt.imshow(render_pyramid(pyr, levels), cmap="gray")
     plt.show()
 
 
@@ -262,3 +262,4 @@ if __name__ == '__main__':
     monkey = read_image("monkey.jpg",1)
     gpyr, filter_vec = build_gaussian_pyramid(monkey, 3, 3)
     print(len(gpyr))
+    display_pyramid(gpyr,2)
