@@ -94,7 +94,7 @@ def build_gaussian_pyramid(im, max_levels, filter_size):
     gaussian_pyramid = list()
     gaussian_pyramid.append(im)
     filter = build_filter(filter_size)
-    for i in range(max_levels):
+    for i in range(max_levels-1):
         x, y = im.shape
         if x < 16 or y < 16:
             break
@@ -258,3 +258,7 @@ def blending_example2():
     combine_plot(model, dolphin, mask, np.clip(res, 0, 1))
     return model, dolphin, mask.astype(np.bool), res
 
+if __name__ == '__main__':
+    monkey = read_image("monkey.jpg",1)
+    gpyr, filter_vec = build_gaussian_pyramid(monkey, 3, 3)
+    print(len(gpyr))
