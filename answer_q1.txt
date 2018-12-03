@@ -1,0 +1,4 @@
+we know every level of the laplacian pyramid is essentially a BPF with no intersection between the bands.
+combining all the laplacians produces the original images because we tae all the frequencies of the original image.
+giving every level different coefficient means lowering the amplitude of the frequencies in the specific band.
+this way we can achieve different types of filters such as BF,LP,HP.

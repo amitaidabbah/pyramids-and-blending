@@ -225,27 +225,40 @@ def combine_plot(im1, im2, mask, im_blend):
 
 
 def path(filename):
+    """
+    changes filename to relative path
+    :param filename: file name to change
+    :return: relative path
+    """
     return os.path.join(os.path.dirname(__file__), filename)
 
 
 def blending_example1():
+    """
+    this performs an example image blending
+    :return: image 1, image 2, mask as bool , result
+    """
     eye = read_image(path('eye.jpg'), 2)
     moon = read_image(path('moon.jpg'), 2)
     mask = read_image(path('moonmaskinv.jpg'), 1)
-    res = pyramid_blend_RGB(eye, moon, mask, 10, 15, 15)
+    res = pyramid_blend_RGB(eye, moon, mask, 10, 3, 3)
     combine_plot(eye, moon, mask, np.clip(res, 0, 1))
     return eye, moon, mask.astype(np.bool), res
 
 
 def blending_example2():
+    """
+    this performs an example image blending
+    :return: image 1, image 2, mask as bool , result
+    """
     model = read_image(path("model.jpg"), 2)
     dolphin = read_image(path("dolphins.jpg"), 2)
     mask = read_image(path("dolphinsmaskinv.jpg"), 1)
-    res = pyramid_blend_RGB(model, dolphin, mask, 10, 15, 15)
+    res = pyramid_blend_RGB(model, dolphin, mask, 10, 15, 3)
     combine_plot(model, dolphin, mask, np.clip(res, 0, 1))
     return model, dolphin, mask.astype(np.bool), res
 
 
 if __name__ == '__main__':
     blending_example1()
-    blending_example2()
+    # blending_example2()
