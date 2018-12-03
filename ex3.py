@@ -1,10 +1,9 @@
-import imageio
+import os
 import numpy as np
 from imageio import imread
 from scipy.ndimage.filters import convolve1d
 from skimage.color import rgb2grey
 import matplotlib.pyplot as plt
-import scipy.misc
 
 BASE_FILTER = np.array([1, 1])
 RGB = 2
@@ -123,7 +122,7 @@ def build_laplacian_pyramid(im, max_levels, filter_size):
 
 def laplacian_to_image(lpyr, filter_vec, coeff):
     """
-    this function constructs lplacian pyramid back to an image.
+    this function constructs laplacian pyramid back to an image.
     :param lpyr: the laplacian pyramid
     :param filter_vec: the vector returned by the function to create the pyramid.
     :param coeff: a list of coefficients specifying weight of each level of the pyramid
@@ -182,7 +181,6 @@ def pyramid_blending(im1, im2, mask, max_levels, filter_size_im, filter_size_mas
     gaus, gaus_filter = build_gaussian_pyramid(mask.astype(np.float64), max_levels, filter_size_mask)
     lap_out = []
     for i in range(len(lap1)):
-        print(len(lap1))
         lap_out.append(gaus[i] * lap1[i] + (1 - gaus[i]) * lap2[i])
     coef = [1 for i in range(len(lap_out))]
     return laplacian_to_image(lap_out, filter1, coef)
@@ -206,17 +204,48 @@ def pyramid_blend_RGB(im1, im2, mask, max_levels, filter_size_im, filter_size_ma
     return res
 
 
-if __name__ == '__main__':
-    model = read_image("model.jpg", 2)
-    dolphin = read_image("dolphins.jpg", 2)
-    mask = read_image("dolphinsmask.jpg", 1)
-    # plt.imshow(mask, cmap="gray")
-    # plt.show()
-    # print(mask.shape, mask.min())
-    # plt.imshow(pear, cmap="gray")
-    # plt.show()
-    res = pyramid_blend_RGB(model, dolphin, mask, 10, 3, 3)
-    print(res.shape)
-    plt.imshow(res)
+def combine_plot(im1, im2, mask, im_blend):
+    """
+    polt all images in the same figure
+    :param im1: 1st RGB image
+    :param im2: 2nd RGB image
+    :param mask: grayscale image.
+    :param im_blend: result RGB image.
+    """
+    plt.figure(facecolor='black')
+    plt.subplot(2, 2, 1)
+    plt.imshow(im1)
+    plt.subplot(2, 2, 2)
+    plt.imshow(im2)
+    plt.subplot(2, 2, 3)
+    plt.imshow(mask, cmap='gray')
+    plt.subplot(2, 2, 4)
+    plt.imshow(im_blend)
     plt.show()
-    scipy.misc.imsave("res.jpg", res, )
+
+
+def path(filename):
+    return os.path.join(os.path.dirname(__file__), filename)
+
+
+def blending_example1():
+    eye = read_image(path('eye.jpg'), 2)
+    moon = read_image(path('moon.jpg'), 2)
+    mask = read_image(path('moonmaskinv.jpg'), 1)
+    res = pyramid_blend_RGB(eye, moon, mask, 10, 15, 15)
+    combine_plot(eye, moon, mask, np.clip(res, 0, 1))
+    return eye, moon, mask.astype(np.bool), res
+
+
+def blending_example2():
+    model = read_image(path("model.jpg"), 2)
+    dolphin = read_image(path("dolphins.jpg"), 2)
+    mask = read_image(path("dolphinsmaskinv.jpg"), 1)
+    res = pyramid_blend_RGB(model, dolphin, mask, 10, 15, 15)
+    combine_plot(model, dolphin, mask, np.clip(res, 0, 1))
+    return model, dolphin, mask.astype(np.bool), res
+
+
+if __name__ == '__main__':
+    blending_example1()
+    blending_example2()
