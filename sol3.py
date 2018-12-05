@@ -94,7 +94,7 @@ def build_gaussian_pyramid(im, max_levels, filter_size):
     gaussian_pyramid = list()
     gaussian_pyramid.append(im)
     filter = build_filter(filter_size)
-    for i in range(max_levels-1):
+    for i in range(max_levels - 1):
         x, y = im.shape
         if x < 16 or y < 16:
             break
@@ -147,9 +147,8 @@ def render_pyramid(pyr, levels):
     new_image = np.zeros((pyr[0].shape[0], width))
     old_y = 0
     for i in range(levels):
-        new_image[0:pyr[i].shape[0], old_y:old_y + pyr[i].shape[1]] = np.interp(pyr[i],
-                                                                                (np.min(pyr[i]), np.max(pyr[i])),
-                                                                                (0, 1))
+        strech = np.interp(pyr[i], (np.min(pyr[i]), np.max(pyr[i])), (0, 1))
+        new_image[0:pyr[i].shape[0], old_y:old_y + pyr[i].shape[1]] = strech
         old_y += pyr[i].shape[1]
     return new_image
 
@@ -241,9 +240,11 @@ def blending_example1():
     eye = read_image(path('eye.jpg'), 2)
     moon = read_image(path('moon.jpg'), 2)
     mask = read_image(path('moonmaskinv.jpg'), 1)
+    mask = np.around(mask)
     res = pyramid_blend_RGB(eye, moon, mask, 10, 3, 3)
-    combine_plot(eye, moon, mask, np.clip(res, 0, 1))
-    return eye, moon, mask.astype(np.bool), res
+    strechres = np.interp(res, (np.min(res), np.max(res)), (0, 1))
+    combine_plot(eye, moon, mask, strechres)
+    return eye, moon, mask.astype(np.bool), strechres
 
 
 def blending_example2():
@@ -254,12 +255,8 @@ def blending_example2():
     model = read_image(path("model.jpg"), 2)
     dolphin = read_image(path("dolphins.jpg"), 2)
     mask = read_image(path("dolphinsmaskinv.jpg"), 1)
-    res = pyramid_blend_RGB(model, dolphin, mask, 10, 15, 3)
-    combine_plot(model, dolphin, mask, np.clip(res, 0, 1))
-    return model, dolphin, mask.astype(np.bool), res
+    res = pyramid_blend_RGB(model, dolphin, mask, 3, 3, 3)
+    strechres = np.interp(res, (np.min(res), np.max(res)), (0, 1))
+    combine_plot(model, dolphin, mask, strechres)
+    return model, dolphin, mask.astype(np.bool), strechres
 
-if __name__ == '__main__':
-    monkey = read_image("monkey.jpg",1)
-    gpyr, filter_vec = build_gaussian_pyramid(monkey, 3, 3)
-    print(len(gpyr))
-    display_pyramid(gpyr,2)
