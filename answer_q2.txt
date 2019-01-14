@@ -1,2 +1,0 @@
-changing the size of the gaussian filter, especially enlarging it causing us to take lower and lower frequencies.
-this means that when we produce the laplacian we take narrower band of frequencies.

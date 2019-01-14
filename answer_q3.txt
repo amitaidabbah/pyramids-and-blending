@@ -1,3 +1,0 @@
-as explaind in q1 using more levels means we blend more frequency ranges of the iamges.
-lower  number means blending only the lower frequencies, and higher number means blending the
-higher frequencies also.

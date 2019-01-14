@@ -1,14 +1,5 @@
 # ex3-amitaidabbah
 
-sol3.py
-answer_q1.txt
-answer_q2.txt
-answer_q3.txt
-
-model.jpg
-dolphins.jpg
-dolphinsmaskinv.jpg
-
-eye.jpg
-moon.jpg
-moonmaskinv.jpg
+This deals with image pyramids, low-pass and band-pass filtering, and their application in image
+blending. I will construct Gaussian and Laplacian pyramids, use these to implement
+pyramid blending.
